@@ -748,7 +748,7 @@ public class FileUse {
         String pnetName = "";
         FileInputStream fis = null;
         try {
-            String libraryText = "";
+            StringBuilder libraryText = new StringBuilder();
             Path path = FileSystems.getDefault().getPath(
                     System.getProperty("user.dir"),"src","LibNet", "NetLibrary.java"); //added by Inna 29.09.2018
             String pathNetLibrary = path.toString();
@@ -756,14 +756,14 @@ public class FileUse {
 
             int content;
             while ((content = fis.read()) != -1) {
-		libraryText += (char) content;
+		libraryText.append((char) content);
             }
             String methodBeginning = "public static PetriNet " + methodName + "("; // modified by Katya 20.11.2016
             String methodEnding = "return d_Net;";
             String methodText = "";
 
             Pattern pattern = Pattern.compile(Pattern.quote(methodBeginning) + Pattern.quote(paramsString) + Pattern.quote(")") + "([[^}]^\\r]*)" + Pattern.quote(methodEnding)); // modified by Katya 22.11.2016
-            Matcher matcher = pattern.matcher(libraryText);
+            Matcher matcher = pattern.matcher(libraryText.toString());
             if(matcher.find()){
                  methodText = methodBeginning + paramsString + ")" + matcher.group(1) + methodEnding + "}"; // modified by Katya 22.11.2016
             } else {
