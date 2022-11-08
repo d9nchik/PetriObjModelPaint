@@ -1,16 +1,11 @@
 package LibNet;
 
-import PetriObj.ArcIn;
-import PetriObj.ArcOut;
-import PetriObj.ExceptionInvalidNetStructure;
-import PetriObj.ExceptionInvalidTimeDelay;
-import PetriObj.PetriNet;
-import PetriObj.PetriP;
-import PetriObj.PetriT;
+import PetriObj.*;
+
 import java.util.ArrayList;
 import java.util.Random;
 public class NetLibrary {
-    
+
 /**
      * Creates Petri net that describes the dynamics of system of the mass
      * service (with unlimited queue)
@@ -166,7 +161,7 @@ public static PetriNet CreateNetFork(double p1, double p2, double p3) throws Exc
         ArcOut.initNext();
 
         return d_Net;
-    }    
+    }
 
 /*pblic static PetriNet CreateNetMalware() throws ExceptionInvalidNetStructure, ExceptionInvalidTimeDelay {
 	ArrayList<PetriP> d_P = new ArrayList<>();
@@ -437,7 +432,7 @@ public static PetriNet CreateNetThread3() throws ExceptionInvalidNetStructure, E
 	d_Out.add(new ArcOut(d_T.get(7),d_P.get(13),1));
 	d_Out.add(new ArcOut(d_T.get(9),d_P.get(6),1));
 	d_Out.add(new ArcOut(d_T.get(5),d_P.get(6),1));
-        
+
 	PetriNet d_Net = new PetriNet("friendThread",d_P,d_T,d_In,d_Out);
 	PetriP.initNext();
 	PetriT.initNext();
@@ -813,7 +808,7 @@ public static PetriNet CreateNetTask(double a) throws ExceptionInvalidNetStructu
         for(PetriT tr: d_T){
             d_In.add(new ArcIn(d_P.get(2),tr,1));
             d_Out.add(new ArcOut(tr,d_P.get(2),1));
-            
+
         }
 	PetriNet d_Net = new PetriNet("Task",d_P,d_T,d_In,d_Out);
 	PetriP.initNext();
@@ -872,7 +867,7 @@ public static PetriNet CreateNetSMOgroup(int numInGroup,int numChannel, double t
         ArrayList<PetriT> d_T = new ArrayList<>();
         ArrayList<ArcIn> d_In = new ArrayList<>();
         ArrayList<ArcOut> d_Out = new ArrayList<>();
-        d_P.add(new PetriP("P0", 0)); 
+        d_P.add(new PetriP("P0", 0));
         for (int j = 0; j < numInGroup; j++) {
             d_P.add(new PetriP("P" + (2 * j + 1), numChannel));
             d_P.add(new PetriP("P" + (2 * j + 2), 0));
@@ -893,4 +888,90 @@ public static PetriNet CreateNetSMOgroup(int numInGroup,int numChannel, double t
         return d_Net;
     }
 
+public static PetriNet CreateNetCoursework6() throws ExceptionInvalidNetStructure, ExceptionInvalidTimeDelay {
+	int n = 500;
+
+	ArrayList<PetriP> d_P = new ArrayList<>();
+	ArrayList<PetriT> d_T = new ArrayList<>();
+	ArrayList<ArcIn> d_In = new ArrayList<>();
+	ArrayList<ArcOut> d_Out = new ArrayList<>();
+	d_P.add(new PetriP("P1",1));
+	d_P.add(new PetriP("ShipQueue",0));
+	d_P.add(new PetriPPortAvailability("FreePorts1",1));
+	d_P.add(new PetriP("P5",0));
+	d_P.add(new PetriP("P6",0));
+	d_P.add(new PetriP("ShipProccessed",0));
+	d_P.add(new PetriP("Crane1",1));
+	d_P.add(new PetriPPortAvailability("FreePorts2",1));
+	d_P.add(new PetriP("P1",0));
+	d_P.add(new PetriP("Crane2",1));
+	d_P.add(new PetriP("P3",0));
+	d_T.add(new PetriT("Ship come",1.25));
+	d_T.get(0).setDistribution("exp", d_T.get(0).getTimeServ());
+	d_T.get(0).setParamDeviation(0.0);
+	d_T.add(new PetriT("Start1",0.0));
+	d_T.add(new PetriT("Service1",1.0/n));
+	d_T.get(2).setDistribution("unif", d_T.get(2).getTimeServ());
+	d_T.get(2).setParamDeviation(0.5/n);
+	d_T.add(new PetriT("Exit1",0.0));
+	d_T.add(new PetriT("Service1 x 2",0.5/n));
+	d_T.get(4).setDistribution("unif", d_T.get(4).getTimeServ());
+	d_T.get(4).setParamDeviation(0.25/n);
+	d_T.get(4).setPriority(1);
+	d_T.add(new PetriT("Start2",0.0));
+	d_T.add(new PetriT("Service2",1.0/n));
+	d_T.get(6).setDistribution("unif", d_T.get(6).getTimeServ());
+	d_T.get(6).setParamDeviation(0.5/n);
+	d_T.add(new PetriT("Exit2",0.0));
+	d_T.add(new PetriT("Service2 x 2",0.5/n));
+	d_T.get(8).setDistribution("unif", d_T.get(8).getTimeServ());
+	d_T.get(8).setParamDeviation(0.25/n);
+	d_T.get(8).setPriority(1);
+	d_In.add(new ArcIn(d_P.get(0),d_T.get(0),1));
+	d_In.add(new ArcIn(d_P.get(1),d_T.get(1),1));
+	d_In.add(new ArcIn(d_P.get(2),d_T.get(1),1));
+	d_In.add(new ArcIn(d_P.get(3),d_T.get(2),1));
+	d_In.add(new ArcIn(d_P.get(4),d_T.get(3),n));
+	d_In.add(new ArcIn(d_P.get(6),d_T.get(2),1));
+	d_In.add(new ArcIn(d_P.get(3),d_T.get(4),1));
+	d_In.add(new ArcIn(d_P.get(6),d_T.get(4),1));
+	d_In.add(new ArcIn(d_P.get(7),d_T.get(4),1));
+	d_In.get(8).setInf(true);
+	d_In.add(new ArcIn(d_P.get(7),d_T.get(5),1));
+	d_In.add(new ArcIn(d_P.get(1),d_T.get(5),1));
+	d_In.add(new ArcIn(d_P.get(8),d_T.get(6),1));
+	d_In.add(new ArcIn(d_P.get(10),d_T.get(7),n));
+	d_In.add(new ArcIn(d_P.get(9),d_T.get(4),1));
+	d_In.add(new ArcIn(d_P.get(9),d_T.get(6),1));
+	d_In.add(new ArcIn(d_P.get(9),d_T.get(8),1));
+	d_In.add(new ArcIn(d_P.get(8),d_T.get(8),1));
+	d_In.add(new ArcIn(d_P.get(2),d_T.get(8),1));
+	d_In.get(17).setInf(true);
+	d_In.add(new ArcIn(d_P.get(6),d_T.get(8),1));
+	d_Out.add(new ArcOut(d_T.get(0),d_P.get(0),1));
+	d_Out.add(new ArcOut(d_T.get(0),d_P.get(1),1));
+	d_Out.add(new ArcOut(d_T.get(1),d_P.get(3),n));
+	d_Out.add(new ArcOut(d_T.get(2),d_P.get(4),1));
+	d_Out.add(new ArcOut(d_T.get(3),d_P.get(5),1));
+	d_Out.add(new ArcOut(d_T.get(3),d_P.get(2),1));
+	d_Out.add(new ArcOut(d_T.get(2),d_P.get(6),1));
+	d_Out.add(new ArcOut(d_T.get(4),d_P.get(6),1));
+	d_Out.add(new ArcOut(d_T.get(4),d_P.get(4),1));
+	d_Out.add(new ArcOut(d_T.get(5),d_P.get(8),n));
+	d_Out.add(new ArcOut(d_T.get(6),d_P.get(10),1));
+	d_Out.add(new ArcOut(d_T.get(7),d_P.get(5),1));
+	d_Out.add(new ArcOut(d_T.get(4),d_P.get(9),1));
+	d_Out.add(new ArcOut(d_T.get(6),d_P.get(9),1));
+	d_Out.add(new ArcOut(d_T.get(8),d_P.get(9),1));
+	d_Out.add(new ArcOut(d_T.get(8),d_P.get(10),1));
+	d_Out.add(new ArcOut(d_T.get(7),d_P.get(7),1));
+	d_Out.add(new ArcOut(d_T.get(8),d_P.get(6),1));
+	PetriNet d_Net = new PetriNet("Coursework6",d_P,d_T,d_In,d_Out);
+	PetriP.initNext();
+	PetriT.initNext();
+	ArcIn.initNext();
+	ArcOut.initNext();
+
+	return d_Net;
+}
 }

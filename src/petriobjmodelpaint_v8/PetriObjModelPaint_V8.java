@@ -30,12 +30,7 @@ public class PetriObjModelPaint_V8 {
                     .log(java.util.logging.Level.SEVERE, null, ex);
         }
 		/* Create and display the form */
-        java.awt.EventQueue.invokeLater(new Runnable() {
-            @Override
-            public void run() {
-                new PetriNetsFrame().setVisible(true);
-            }
-        });
+        java.awt.EventQueue.invokeLater(() -> new PetriNetsFrame().setVisible(true));
     }
     
 }

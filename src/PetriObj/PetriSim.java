@@ -237,6 +237,11 @@ public class PetriSim implements Cloneable, Serializable {
      */
     public void setTimeCurr(double aTimeCurr) {
         getTimeState().setCurrentTime(aTimeCurr);
+        for (PetriP position : listPositionsForStatistica) {
+            if (position instanceof PetriPPortAvailability port){
+                port.setCurrentTime(aTimeCurr);
+            }
+        }
     }
     /**
      * @return the timeMod
@@ -293,7 +298,7 @@ public class PetriSim implements Cloneable, Serializable {
         this.printMark();//друкувати поточне маркування
         ArrayList<PetriT> activeT = this.findActiveT();     //формування списку активних переходів
 
-        if ((activeT.isEmpty() && isBufferEmpty() == true) || this.getCurrentTime() >= getSimulationTime()) { //зупинка імітації за умови, що
+        if ((activeT.isEmpty() && isBufferEmpty()) || this.getCurrentTime() >= getSimulationTime()) { //зупинка імітації за умови, що
                                                                                             //немає переходів, які запускаються,
          //   stop = true;                              // і немає маркерів у переходах, або вичерпаний час моделювання
             System.out.println("STOP in Net  " + this.getName());
@@ -335,7 +340,7 @@ public class PetriSim implements Cloneable, Serializable {
 
                 if (eventMin.getBuffer() > 0) {
                     boolean u = true;
-                    while (u == true) {
+                    while (u) {
                         eventMin.minEvent();
                         if (eventMin.getMinTime() == this.getCurrentTime()) {
 
