@@ -982,7 +982,7 @@ public static PetriNet CreateNetTask3() throws ExceptionInvalidNetStructure, Exc
 	d_P.add(new PetriP("P10",1));
 	d_P.add(new PetriP("P11",0));
 	d_P.add(new PetriP("CompleteOrder",0));
-	d_P.add(new PetriP("P13",0));
+	d_P.add(new PetriP("WaitingUsers",0));
 	d_P.add(new PetriP("P14",0));
 	d_P.add(new PetriP("NotSatisfied",0));
 	d_T.add(new PetriT("T1",0.0));
