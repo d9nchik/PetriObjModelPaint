@@ -1,16 +1,11 @@
 package LibNet;
 
-import PetriObj.ArcIn;
-import PetriObj.ArcOut;
-import PetriObj.ExceptionInvalidNetStructure;
-import PetriObj.ExceptionInvalidTimeDelay;
-import PetriObj.PetriNet;
-import PetriObj.PetriP;
-import PetriObj.PetriT;
+import PetriObj.*;
+
 import java.util.ArrayList;
 import java.util.Random;
 public class NetLibrary {
-    
+
 /**
      * Creates Petri net that describes the dynamics of system of the mass
      * service (with unlimited queue)
@@ -166,7 +161,7 @@ public static PetriNet CreateNetFork(double p1, double p2, double p3) throws Exc
         ArcOut.initNext();
 
         return d_Net;
-    }    
+    }
 
 /*pblic static PetriNet CreateNetMalware() throws ExceptionInvalidNetStructure, ExceptionInvalidTimeDelay {
 	ArrayList<PetriP> d_P = new ArrayList<>();
@@ -437,7 +432,7 @@ public static PetriNet CreateNetThread3() throws ExceptionInvalidNetStructure, E
 	d_Out.add(new ArcOut(d_T.get(7),d_P.get(13),1));
 	d_Out.add(new ArcOut(d_T.get(9),d_P.get(6),1));
 	d_Out.add(new ArcOut(d_T.get(5),d_P.get(6),1));
-        
+
 	PetriNet d_Net = new PetriNet("friendThread",d_P,d_T,d_In,d_Out);
 	PetriP.initNext();
 	PetriT.initNext();
@@ -813,7 +808,7 @@ public static PetriNet CreateNetTask(double a) throws ExceptionInvalidNetStructu
         for(PetriT tr: d_T){
             d_In.add(new ArcIn(d_P.get(2),tr,1));
             d_Out.add(new ArcOut(tr,d_P.get(2),1));
-            
+
         }
 	PetriNet d_Net = new PetriNet("Task",d_P,d_T,d_In,d_Out);
 	PetriP.initNext();
@@ -872,7 +867,7 @@ public static PetriNet CreateNetSMOgroup(int numInGroup,int numChannel, double t
         ArrayList<PetriT> d_T = new ArrayList<>();
         ArrayList<ArcIn> d_In = new ArrayList<>();
         ArrayList<ArcOut> d_Out = new ArrayList<>();
-        d_P.add(new PetriP("P0", 0)); 
+        d_P.add(new PetriP("P0", 0));
         for (int j = 0; j < numInGroup; j++) {
             d_P.add(new PetriP("P" + (2 * j + 1), numChannel));
             d_P.add(new PetriP("P" + (2 * j + 2), 0));
@@ -893,4 +888,83 @@ public static PetriNet CreateNetSMOgroup(int numInGroup,int numChannel, double t
         return d_Net;
     }
 
+public static PetriNet CreateNetTask2Device() throws ExceptionInvalidNetStructure, ExceptionInvalidTimeDelay {
+	ArrayList<PetriP> d_P = new ArrayList<>();
+	ArrayList<PetriT> d_T = new ArrayList<>();
+	ArrayList<ArcIn> d_In = new ArrayList<>();
+	ArrayList<ArcOut> d_Out = new ArrayList<>();
+	d_P.add(new PetriP("IncomeDetails",0));
+	d_P.add(new PetriP("Processed",0));
+	d_P.add(new PetriP("Device1Resource",1));
+	d_P.add(new PetriP("NotProcessedDetails",0));
+	d_T.add(new PetriT("Device1",1.0));
+	d_T.get(0).setDistribution("exp", d_T.get(0).getTimeServ());
+	d_T.get(0).setParamDeviation(0.0);
+	d_T.get(0).setPriority(1);
+	d_T.add(new PetriT("ToDevice2",1.0));
+	d_In.add(new ArcIn(d_P.get(0),d_T.get(0),1));
+	d_In.add(new ArcIn(d_P.get(0),d_T.get(1),1));
+	d_In.add(new ArcIn(d_P.get(2),d_T.get(0),1));
+	d_Out.add(new ArcOut(d_T.get(0),d_P.get(1),1));
+	d_Out.add(new ArcOut(d_T.get(0),d_P.get(2),1));
+	d_Out.add(new ArcOut(d_T.get(1),d_P.get(3),1));
+	PetriNet d_Net = new PetriNet("Task2Device",d_P,d_T,d_In,d_Out);
+	PetriP.initNext();
+	PetriT.initNext();
+	ArcIn.initNext();
+	ArcOut.initNext();
+
+	return d_Net;
+}
+
+public static PetriNet CreateNetTask2Device(int deviceNumber, double moveToNextDeviceTime) throws ExceptionInvalidNetStructure, ExceptionInvalidTimeDelay {
+	ArrayList<PetriP> d_P = new ArrayList<>();
+	ArrayList<PetriT> d_T = new ArrayList<>();
+	ArrayList<ArcIn> d_In = new ArrayList<>();
+	ArrayList<ArcOut> d_Out = new ArrayList<>();
+	d_P.add(new PetriP("IncomeDetails"+deviceNumber,0));
+	d_P.add(new PetriP("Processed",0));
+	d_P.add(new PetriP("Device"+deviceNumber+"Resource",1));
+	d_P.add(new PetriP("NotProcessedDetails"+deviceNumber,0));
+	d_T.add(new PetriT("Device" + deviceNumber,1.0));
+	d_T.get(0).setDistribution("exp", d_T.get(0).getTimeServ());
+	d_T.get(0).setParamDeviation(0.0);
+	d_T.get(0).setPriority(1);
+	d_T.add(new PetriT("ToDevice" + (deviceNumber+1), moveToNextDeviceTime));
+	d_In.add(new ArcIn(d_P.get(0),d_T.get(0),1));
+	d_In.add(new ArcIn(d_P.get(0),d_T.get(1),1));
+	d_In.add(new ArcIn(d_P.get(2),d_T.get(0),1));
+	d_Out.add(new ArcOut(d_T.get(0),d_P.get(1),1));
+	d_Out.add(new ArcOut(d_T.get(0),d_P.get(2),1));
+	d_Out.add(new ArcOut(d_T.get(1),d_P.get(3),1));
+	PetriNet d_Net = new PetriNet("Task2Device",d_P,d_T,d_In,d_Out);
+	PetriP.initNext();
+	PetriT.initNext();
+	ArcIn.initNext();
+	ArcOut.initNext();
+
+	return d_Net;
+}
+
+
+
+public static PetriNet CreateNetTask2DetailsIncome() throws ExceptionInvalidNetStructure, ExceptionInvalidTimeDelay {
+	ArrayList<PetriP> d_P = new ArrayList<>();
+	ArrayList<PetriT> d_T = new ArrayList<>();
+	ArrayList<ArcIn> d_In = new ArrayList<>();
+	ArrayList<ArcOut> d_Out = new ArrayList<>();
+	d_P.add(new PetriP("Resource",1));
+	d_P.add(new PetriP("Details",0));
+	d_T.add(new PetriT("DetailsIncome",0.25));
+	d_In.add(new ArcIn(d_P.get(0),d_T.get(0),1));
+	d_Out.add(new ArcOut(d_T.get(0),d_P.get(1),1));
+	d_Out.add(new ArcOut(d_T.get(0),d_P.get(0),1));
+	PetriNet d_Net = new PetriNet("Task2DetailsIncome",d_P,d_T,d_In,d_Out);
+	PetriP.initNext();
+	PetriT.initNext();
+	ArcIn.initNext();
+	ArcOut.initNext();
+
+	return d_Net;
+}
 }
