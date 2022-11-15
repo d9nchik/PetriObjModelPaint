@@ -9,7 +9,6 @@ package LibTest;
 import LibNet.NetLibrary;
 import PetriObj.*;
 
-import java.text.DecimalFormat;
 import java.util.ArrayList;
 
 
@@ -27,21 +26,20 @@ public class TestPetriObjSimulation {  //Результати співпадаю
         double[] processTimes = new double[]{0.1, 1, 10, 100};
         double[] moveTimes = new double[]{ 1, 10, 100};
 
-        System.out.printf("%s\t%s\t%s\t", "income", "process", "move");
+        System.out.printf("%8s\t%8s\t%8s\t", "income", "process", "move");
 
         for (int i = 0; i < processors; i++) {
-            System.out.printf("%s\t", "P" + i);
+            System.out.printf("%8s\t", "P" + i);
         }
         for (int i = 0; i < processors; i++) {
-            System.out.printf("%s\t", "C" + i);
+            System.out.printf("%8s\t", "C" + i);
         }
-        System.out.printf("%s\n", "D");
-        DecimalFormat format = new DecimalFormat("0.#");
+        System.out.printf("%5s\n", "D");
 
         for (double incomeTime: incomeTimes) {
             for(double processTime : processTimes){
                 for (double moveTime: moveTimes){
-                    System.out.printf("%s\t%s\t%s\t", format.format(incomeTime), format.format(processTime), format.format(moveTime));
+                    System.out.printf("%f\t%f\t%f\t", incomeTime, processTime, moveTime);
                     PetriObjModel model = getModel(processors, incomeTime, processTime, moveTime);
                     model.setIsProtokol(false);
                     double timeModeling = 1_000;
@@ -51,14 +49,14 @@ public class TestPetriObjSimulation {  //Результати співпадаю
                     for (int i = 0; i < processors; i++) {
                         PetriNet petriNet = model.getListObj().get(i + 1).getNet();
                         // Processor load
-                        System.out.printf("%s\t", format.format(petriNet.getListT()[0].getMean()));
+                        System.out.printf("%f\t", petriNet.getListT()[0].getMean());
                     }
                     for (int i = 0; i < processors; i++) {
                         PetriNet petriNet = model.getListObj().get(i + 1).getNet();
                         // Convejer
-                        System.out.printf("%s\t", format.format(petriNet.getListT()[1].getMean()));
+                        System.out.printf("%f\t", petriNet.getListT()[1].getMean());
                     }
-                    System.out.printf("%s\n", format.format(model.getListObj().get(1).getNet().getListP()[0].getObservedMax()));
+                    System.out.printf("%d\n", model.getListObj().get(1).getNet().getListP()[0].getObservedMax());
                 }
             }
         }
