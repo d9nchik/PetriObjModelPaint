@@ -917,7 +917,7 @@ public static PetriNet CreateNetTask2Device() throws ExceptionInvalidNetStructur
 	return d_Net;
 }
 
-public static PetriNet CreateNetTask2Device(int deviceNumber, double moveToNextDeviceTime) throws ExceptionInvalidNetStructure, ExceptionInvalidTimeDelay {
+public static PetriNet CreateNetTask2Device(int deviceNumber, double moveToNextDeviceTime, double processTime) throws ExceptionInvalidNetStructure, ExceptionInvalidTimeDelay {
 	ArrayList<PetriP> d_P = new ArrayList<>();
 	ArrayList<PetriT> d_T = new ArrayList<>();
 	ArrayList<ArcIn> d_In = new ArrayList<>();
@@ -926,9 +926,8 @@ public static PetriNet CreateNetTask2Device(int deviceNumber, double moveToNextD
 	d_P.add(new PetriP("Processed",0));
 	d_P.add(new PetriP("Device"+deviceNumber+"Resource",1));
 	d_P.add(new PetriP("NotProcessedDetails"+deviceNumber,0));
-	d_T.add(new PetriT("Device" + deviceNumber,1.0));
+	d_T.add(new PetriT("Device" + deviceNumber, processTime));
 	d_T.get(0).setDistribution("exp", d_T.get(0).getTimeServ());
-	d_T.get(0).setParamDeviation(0.0);
 	d_T.get(0).setPriority(1);
 	d_T.add(new PetriT("ToDevice" + (deviceNumber+1), moveToNextDeviceTime));
 	d_In.add(new ArcIn(d_P.get(0),d_T.get(0),1));
@@ -948,14 +947,14 @@ public static PetriNet CreateNetTask2Device(int deviceNumber, double moveToNextD
 
 
 
-public static PetriNet CreateNetTask2DetailsIncome() throws ExceptionInvalidNetStructure, ExceptionInvalidTimeDelay {
+public static PetriNet CreateNetTask2DetailsIncome(double incomeTime) throws ExceptionInvalidNetStructure, ExceptionInvalidTimeDelay {
 	ArrayList<PetriP> d_P = new ArrayList<>();
 	ArrayList<PetriT> d_T = new ArrayList<>();
 	ArrayList<ArcIn> d_In = new ArrayList<>();
 	ArrayList<ArcOut> d_Out = new ArrayList<>();
 	d_P.add(new PetriP("Resource",1));
 	d_P.add(new PetriP("Details",0));
-	d_T.add(new PetriT("DetailsIncome",0.25));
+	d_T.add(new PetriT("DetailsIncome", incomeTime));
 	d_In.add(new ArcIn(d_P.get(0),d_T.get(0),1));
 	d_Out.add(new ArcOut(d_T.get(0),d_P.get(1),1));
 	d_Out.add(new ArcOut(d_T.get(0),d_P.get(0),1));
