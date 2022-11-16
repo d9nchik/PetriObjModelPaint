@@ -966,7 +966,7 @@ public static PetriNet CreateNetTask2DetailsIncome(double incomeTime) throws Exc
 
 	return d_Net;
 }
-public static PetriNet CreateNetTask3() throws ExceptionInvalidNetStructure, ExceptionInvalidTimeDelay {
+public static PetriNet CreateNetTask3(double fridgeCreationTime, double reorderTime, double clientComeTime, double possibilityOfClientWaiting) throws ExceptionInvalidNetStructure, ExceptionInvalidTimeDelay {
 	ArrayList<PetriP> d_P = new ArrayList<>();
 	ArrayList<PetriT> d_T = new ArrayList<>();
 	ArrayList<ArcIn> d_In = new ArrayList<>();
@@ -986,22 +986,21 @@ public static PetriNet CreateNetTask3() throws ExceptionInvalidNetStructure, Exc
 	d_P.add(new PetriP("P14",0));
 	d_P.add(new PetriP("NotSatisfied",0));
 	d_T.add(new PetriT("T1",0.0));
-	d_T.add(new PetriT("T2",4.0));
+	d_T.add(new PetriT("T2",reorderTime));
 	d_T.add(new PetriT("T3",0.0));
 	d_T.get(2).setPriority(1);
 	d_T.add(new PetriT("T5",0.0));
 	d_T.add(new PetriT("T6",0.0));
-	d_T.add(new PetriT("T7",3.0));
+	d_T.add(new PetriT("T7",fridgeCreationTime));
 	d_T.add(new PetriT("T8",0.0));
-	d_T.add(new PetriT("T9",0.2));
+	d_T.add(new PetriT("T9",clientComeTime));
 	d_T.get(7).setDistribution("exp", d_T.get(7).getTimeServ());
-	d_T.get(7).setParamDeviation(0.0);
 	d_T.add(new PetriT("T10",0.0));
 	d_T.get(8).setPriority(1);
 	d_T.add(new PetriT("T11",0.0));
 	d_T.get(9).setPriority(2);
 	d_T.add(new PetriT("T12",0.0));
-	d_T.get(10).setProbability(0.2);
+	d_T.get(10).setProbability(possibilityOfClientWaiting);
 	d_T.add(new PetriT("T13",0.0));
 	d_T.add(new PetriT("T14",0.0));
 	d_In.add(new ArcIn(d_P.get(0),d_T.get(1),1));
