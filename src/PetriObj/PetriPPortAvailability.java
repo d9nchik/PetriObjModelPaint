@@ -42,6 +42,14 @@ public class PetriPPortAvailability extends PetriP {
         return sumTime / n;
     }
 
+    public double getSumTime() {
+        return sumTime;
+    }
+
+    public double getN() {
+        return n;
+    }
+
     public void setCurrentTime(double currentTime) {
         this.currentTime = currentTime;
     }
