@@ -941,7 +941,9 @@ public static PetriNet CreateNetPeopleIncome() throws ExceptionInvalidNetStructu
 	d_P.add(new PetriP("People",0));
 	d_P.add(new PetriP("PeopleWaiting",0));
 	d_P.add(new PetriP("LostProfit",0));
-	d_T.add(new PetriT("PeopleIncome",0.0));
+	d_T.add(new PetriT("PeopleIncome",0.5));
+	d_T.get(0).setDistribution("norm", d_T.get(0).getTimeServ());
+	d_T.get(0).setParamDeviation(0.1);
 	d_T.add(new PetriT("PeopleToStop",0.0));
 	d_T.add(new PetriT("Cancel",0.0));
 	d_In.add(new ArcIn(d_P.get(0),d_T.get(0),1));
