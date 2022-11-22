@@ -902,4 +902,62 @@ public static PetriNet CreateRobot(double timeMean, double timeDeviation,String 
 public static PetriNet CreateWorkTable(double timeMean, String workTableName) throws ExceptionInvalidNetStructure, ExceptionInvalidTimeDelay{
 	return CreateNetSMOwithoutQueue(1, timeMean, workTableName);
 }
+public static PetriNet CreateNetBus() throws ExceptionInvalidNetStructure, ExceptionInvalidTimeDelay {
+	ArrayList<PetriP> d_P = new ArrayList<>();
+	ArrayList<PetriT> d_T = new ArrayList<>();
+	ArrayList<ArcIn> d_In = new ArrayList<>();
+	ArrayList<ArcOut> d_Out = new ArrayList<>();
+	d_P.add(new PetriP("PeopleOnBusStop",0));
+	d_P.add(new PetriP("MoneyEarned",0));
+	d_P.add(new PetriP("BusResource",1));
+	d_P.add(new PetriP("PeopleDelievered",0));
+	d_T.add(new PetriT("TakePeople",35.0));
+	d_T.get(0).setDistribution("norm", d_T.get(0).getTimeServ());
+	d_T.get(0).setParamDeviation(6.0);
+	d_T.add(new PetriT("ReturnBack",30.0));
+	d_T.get(1).setDistribution("norm", d_T.get(1).getTimeServ());
+	d_T.get(1).setParamDeviation(5.0);
+	d_In.add(new ArcIn(d_P.get(0),d_T.get(0),1));
+	d_In.add(new ArcIn(d_P.get(2),d_T.get(0),1));
+	d_In.add(new ArcIn(d_P.get(3),d_T.get(1),1));
+	d_Out.add(new ArcOut(d_T.get(0),d_P.get(1),20));
+	d_Out.add(new ArcOut(d_T.get(0),d_P.get(3),1));
+	d_Out.add(new ArcOut(d_T.get(1),d_P.get(2),1));
+	PetriNet d_Net = new PetriNet("Bus",d_P,d_T,d_In,d_Out);
+	PetriP.initNext();
+	PetriT.initNext();
+	ArcIn.initNext();
+	ArcOut.initNext();
+
+	return d_Net;
+}
+public static PetriNet CreateNetPeopleIncome() throws ExceptionInvalidNetStructure, ExceptionInvalidTimeDelay {
+	ArrayList<PetriP> d_P = new ArrayList<>();
+	ArrayList<PetriT> d_T = new ArrayList<>();
+	ArrayList<ArcIn> d_In = new ArrayList<>();
+	ArrayList<ArcOut> d_Out = new ArrayList<>();
+	d_P.add(new PetriP("IncomePeopleResource",1));
+	d_P.add(new PetriP("People",0));
+	d_P.add(new PetriP("PeopleWaiting",0));
+	d_P.add(new PetriP("LostProfit",0));
+	d_T.add(new PetriT("PeopleIncome",0.0));
+	d_T.add(new PetriT("PeopleToStop",0.0));
+	d_T.add(new PetriT("Cancel",0.0));
+	d_In.add(new ArcIn(d_P.get(0),d_T.get(0),1));
+	d_In.add(new ArcIn(d_P.get(1),d_T.get(1),1));
+	d_In.add(new ArcIn(d_P.get(1),d_T.get(2),1));
+	d_In.add(new ArcIn(d_P.get(2),d_T.get(2),30));
+	d_In.get(3).setInf(true);
+	d_Out.add(new ArcOut(d_T.get(0),d_P.get(0),1));
+	d_Out.add(new ArcOut(d_T.get(0),d_P.get(1),1));
+	d_Out.add(new ArcOut(d_T.get(1),d_P.get(2),1));
+	d_Out.add(new ArcOut(d_T.get(2),d_P.get(3),20));
+	PetriNet d_Net = new PetriNet("PeopleIncome",d_P,d_T,d_In,d_Out);
+	PetriP.initNext();
+	PetriT.initNext();
+	ArcIn.initNext();
+	ArcOut.initNext();
+
+	return d_Net;
+}
 }
