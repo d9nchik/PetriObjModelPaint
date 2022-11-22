@@ -891,6 +891,15 @@ public static PetriNet CreateNetSMOgroup(int numInGroup,int numChannel, double t
         ArcOut.initNext();
 
         return d_Net;
-    }
-
+}
+public static PetriNet CreateRobot(double timeMean, double timeDeviation,String robotName) throws ExceptionInvalidNetStructure, ExceptionInvalidTimeDelay{
+	PetriNet petriNet =  CreateNetSMOwithoutQueue(1, timeMean,robotName);
+	PetriT petriT =  petriNet.getListT()[0];
+	petriT.setDistribution("norm", timeMean);
+	petriT.setParamDeviation(timeDeviation);
+	return petriNet;
+}
+public static PetriNet CreateWorkTable(double timeMean, String workTableName) throws ExceptionInvalidNetStructure, ExceptionInvalidTimeDelay{
+	return CreateNetSMOwithoutQueue(1, timeMean, workTableName);
+}
 }
