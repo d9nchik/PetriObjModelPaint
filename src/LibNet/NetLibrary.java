@@ -10,7 +10,7 @@ import PetriObj.PetriT;
 import java.util.ArrayList;
 import java.util.Random;
 public class NetLibrary {
-    
+
 /**
      * Creates Petri net that describes the dynamics of system of the mass
      * service (with unlimited queue)
@@ -166,7 +166,7 @@ public static PetriNet CreateNetFork(double p1, double p2, double p3) throws Exc
         ArcOut.initNext();
 
         return d_Net;
-    }    
+    }
 
 /*pblic static PetriNet CreateNetMalware() throws ExceptionInvalidNetStructure, ExceptionInvalidTimeDelay {
 	ArrayList<PetriP> d_P = new ArrayList<>();
@@ -437,7 +437,7 @@ public static PetriNet CreateNetThread3() throws ExceptionInvalidNetStructure, E
 	d_Out.add(new ArcOut(d_T.get(7),d_P.get(13),1));
 	d_Out.add(new ArcOut(d_T.get(9),d_P.get(6),1));
 	d_Out.add(new ArcOut(d_T.get(5),d_P.get(6),1));
-        
+
 	PetriNet d_Net = new PetriNet("friendThread",d_P,d_T,d_In,d_Out);
 	PetriP.initNext();
 	PetriT.initNext();
@@ -813,7 +813,7 @@ public static PetriNet CreateNetTask(double a) throws ExceptionInvalidNetStructu
         for(PetriT tr: d_T){
             d_In.add(new ArcIn(d_P.get(2),tr,1));
             d_Out.add(new ArcOut(tr,d_P.get(2),1));
-            
+
         }
 	PetriNet d_Net = new PetriNet("Task",d_P,d_T,d_In,d_Out);
 	PetriP.initNext();
@@ -872,7 +872,7 @@ public static PetriNet CreateNetSMOgroup(int numInGroup,int numChannel, double t
         ArrayList<PetriT> d_T = new ArrayList<>();
         ArrayList<ArcIn> d_In = new ArrayList<>();
         ArrayList<ArcOut> d_Out = new ArrayList<>();
-        d_P.add(new PetriP("P0", 0)); 
+        d_P.add(new PetriP("P0", 0));
         for (int j = 0; j < numInGroup; j++) {
             d_P.add(new PetriP("P" + (2 * j + 1), numChannel));
             d_P.add(new PetriP("P" + (2 * j + 2), 0));
@@ -902,7 +902,7 @@ public static PetriNet CreateRobot(double timeMean, double timeDeviation,String 
 public static PetriNet CreateWorkTable(double timeMean, String workTableName) throws ExceptionInvalidNetStructure, ExceptionInvalidTimeDelay{
 	return CreateNetSMOwithoutQueue(1, timeMean, workTableName);
 }
-public static PetriNet CreateNetBus() throws ExceptionInvalidNetStructure, ExceptionInvalidTimeDelay {
+public static PetriNet CreateNetBus(double takePeople, double returnBackTime, int priority, int n) throws ExceptionInvalidNetStructure, ExceptionInvalidTimeDelay {
 	ArrayList<PetriP> d_P = new ArrayList<>();
 	ArrayList<PetriT> d_T = new ArrayList<>();
 	ArrayList<ArcIn> d_In = new ArrayList<>();
@@ -911,16 +911,17 @@ public static PetriNet CreateNetBus() throws ExceptionInvalidNetStructure, Excep
 	d_P.add(new PetriP("MoneyEarned",0));
 	d_P.add(new PetriP("BusResource",1));
 	d_P.add(new PetriP("PeopleDelievered",0));
-	d_T.add(new PetriT("TakePeople",35.0));
+	d_T.add(new PetriT("TakePeople",takePeople));
 	d_T.get(0).setDistribution("norm", d_T.get(0).getTimeServ());
 	d_T.get(0).setParamDeviation(6.0);
-	d_T.add(new PetriT("ReturnBack",30.0));
+    d_T.get(0).setPriority(priority);
+	d_T.add(new PetriT("ReturnBack", returnBackTime));
 	d_T.get(1).setDistribution("norm", d_T.get(1).getTimeServ());
 	d_T.get(1).setParamDeviation(5.0);
-	d_In.add(new ArcIn(d_P.get(0),d_T.get(0),1));
+	d_In.add(new ArcIn(d_P.get(0),d_T.get(0), n));
 	d_In.add(new ArcIn(d_P.get(2),d_T.get(0),1));
 	d_In.add(new ArcIn(d_P.get(3),d_T.get(1),1));
-	d_Out.add(new ArcOut(d_T.get(0),d_P.get(1),20));
+	d_Out.add(new ArcOut(d_T.get(0),d_P.get(1),20*n));
 	d_Out.add(new ArcOut(d_T.get(0),d_P.get(3),1));
 	d_Out.add(new ArcOut(d_T.get(1),d_P.get(2),1));
 	PetriNet d_Net = new PetriNet("Bus",d_P,d_T,d_In,d_Out);
