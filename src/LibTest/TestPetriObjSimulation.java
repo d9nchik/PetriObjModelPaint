@@ -18,37 +18,40 @@ import java.util.ArrayList;
  */
 public class TestPetriObjSimulation {  //Результати співпадають з аналітичними обрахунками
     public static void main(String[] args) throws ExceptionInvalidTimeDelay, ExceptionInvalidNetStructure {
-        double repeatModeling = 4;
+        double repeatModeling = 20;
         double timeModeling = 10_000;
 
-        double[] shipIncomeTimes = new double[]{0.01, 1, 100};
-        double[][] serviceTimes = new double[][]{{0.005, 0.015}, {0.5, 1.5}, {50, 150}};
+        double[] shipIncomeTimes = new double[]{1.5, 1};
+        double[] serviceTimes = new double[]{1.2, 1};
 
-        for (double shipIncomeTime : shipIncomeTimes) {
-            for (double[] serviceTime : serviceTimes) {
-                double serviceMeanTime = (serviceTime[1] + serviceTime[0]) / 2;
-                double serviceDeviationTime = (serviceTime[1] - serviceTime[0]) / 2;
+        for (double serviceTime : serviceTimes) {
+            for (double shipIncomeTime : shipIncomeTimes) {
+                System.out.print(shipIncomeTime + "\t" + serviceTime + "\t");
+                for (int i = 0; i < repeatModeling; i++) {
+                    // цей фрагмент для запуску імітації моделі з заданною мережею Петрі на інтервалі часу timeModeling
+                    PetriObjModel model = getModel(shipIncomeTime, serviceTime, 0.5);
+                    model.setIsProtokol(false);
+
+                    model.goWithStep(5_000);
+
+                    // Цей фрагмент для виведення результатів моделювання на консоль
+                    PetriP[] petriP = model.getListObj().get(0).getNet().getListP();
+                    // час обслуговування кораблів
+                    PetriPPortAvailability port1 = (PetriPPortAvailability) petriP[2];
+                    PetriPPortAvailability port2 = (PetriPPortAvailability) petriP[7];
+                    port1.resetMetrics();
+                    port2.resetMetrics();
+
+                    model.goWithStep(timeModeling);
+
+
+                    // середнє
+                    System.out.print((port1.getSumTime() + port2.getSumTime()) / (port1.getN() + port2.getN()) + "\t");
+                }
+                System.out.println();
             }
         }
 
-        for (int i = 0; i < repeatModeling; i++) {
-            // цей фрагмент для запуску імітації моделі з заданною мережею Петрі на інтервалі часу timeModeling
-            PetriObjModel model = getModel(1.25, 1, 0.5);
-            model.setIsProtokol(false);
-            for (int j = 100; j < timeModeling; j += 100) {
-                model.goWithStep(j);
-
-                // Цей фрагмент для виведення результатів моделювання на консоль
-                PetriP[] petriP = model.getListObj().get(0).getNet().getListP();
-
-                // час обслуговування кораблів
-                PetriPPortAvailability port1 = (PetriPPortAvailability) petriP[2];
-                PetriPPortAvailability port2 = (PetriPPortAvailability) petriP[7];
-                // середнє
-                System.out.print((port1.getSumTime() + port2.getSumTime()) / (port1.getN() + port2.getN()) + "\t");
-            }
-            System.out.println();
-        }
     }
 
     public static PetriObjModel getModel(double shipIncomeTime, double serviceMeanTime, double serviceDeviationTime) throws ExceptionInvalidTimeDelay, ExceptionInvalidNetStructure {

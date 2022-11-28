@@ -53,4 +53,11 @@ public class PetriPPortAvailability extends PetriP {
     public void setCurrentTime(double currentTime) {
         this.currentTime = currentTime;
     }
+
+    public void resetMetrics() {
+        sumTime = 0;
+        n = 0;
+        maxTime = 0;
+        minTime = Double.POSITIVE_INFINITY;
+    }
 }
