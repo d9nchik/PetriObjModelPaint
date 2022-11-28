@@ -127,6 +127,134 @@ public class PetriObjModel implements Serializable, Cloneable  {
         this.listObj.forEach(sim -> sim.setTimeState(timeState));
     }
 
+    public void goWithStep(double timeModeling){
+        double min;
+        this.setSimulationTime(timeModeling);
+
+        getListObj().sort(PetriSim.getComparatorByPriority()); //edited 9.11.2015, 12.10.2017
+        for (PetriSim e : getListObj()) { //edited 9.11.2015, 18.07.2018
+            e.input();
+        }
+        if (isProtocolPrint()) {
+            for (PetriSim e : getListObj()) {
+                e.printMark();
+            }
+        }
+        ArrayList<PetriSim> conflictObj = new ArrayList<>();
+        Random r = new Random();
+
+        while (this.getCurrentTime() < this.getSimulationTime()) { // edited 18.07.2018
+
+            conflictObj.clear();
+
+            min = getListObj().get(0).getTimeMin();  //пошук найближчої події
+
+            for (PetriSim e : getListObj()) {
+                if (e.getTimeMin() < min) {
+                    min = e.getTimeMin();
+                }
+            }
+            /*  if(min_t<t){ // added 24.06.2013   !!!!Подумать...при отрицательных задержках висит!!!!
+             JOptionPane.showMessageDialog(null, "Negative time delay was generated! Check parameters, please/");
+             return;
+
+             }*/
+            if (isStatistics()) {
+                for (PetriSim e : getListObj()) {
+                    if (min > 0) {
+                        if(min<this.getSimulationTime())
+                            e.doStatistics((min - this.getCurrentTime()) / min); //статистика за час "дельта т", для спільних позицій потрібно статистику збирати тільки один раз!!!
+                        else
+                            e.doStatistics((this.getSimulationTime() - this.getCurrentTime()) / this.getSimulationTime());
+                    }
+
+                }
+            }
+
+            this.setCurrentTime(min); // просування часу //3.12.2015
+
+            if (isProtocolPrint()) {
+                System.out.println(" Time progress: time = " + this.getCurrentTime() + "\n");
+            }
+            if (this.getCurrentTime() <= this.getSimulationTime()) {
+
+                for (PetriSim sim : getListObj()) {
+                    if (this.getCurrentTime() == sim.getTimeMin()) // розв'язання конфлікту об'єктів рівноймовірнісним способом
+                    {
+                        conflictObj.add(sim);                           //список конфліктних обєктів
+                    }
+                }
+                int num;
+                int max;
+                if (isProtocolPrint()) {
+                    System.out.println(" List of conflicting objects  " + "\n");
+                    for (int ii = 0; ii < conflictObj.size(); ii++) {
+                        System.out.println(" K [ " + ii + "  ] = " + conflictObj.get(ii).getName() + "\n");
+                    }
+                }
+
+                if (conflictObj.size() > 1) { //вибір об'єкта, що запускається
+                    max = conflictObj.size();
+                    conflictObj.sort(PetriSim.getComparatorByPriority());
+                    for (int i = 1; i < conflictObj.size(); i++) { //System.out.println("  "+conflictObj.get(i).getPriority()+"  "+conflictObj.get(i-1).getPriority());
+                        if (conflictObj.get(i).getPriority() < conflictObj.get(i - 1).getPriority()) {
+                            max = i - 1;
+                            //System.out.println("max=  "+max);
+                            break;
+                        }
+
+                    }
+                    if (max == 0) {
+                        num = 0;
+                    } else {
+                        num = r.nextInt(max);
+                    }
+                } else {
+                    num = 0;
+                }
+
+                if (isProtocolPrint()) {
+                    System.out.println(" Selected object  " + conflictObj.get(num).getName() + "\n" + " NextEvent " + "\n");
+                }
+
+                for (PetriSim sim: getListObj()) {
+                    if (sim.getNumObj() == conflictObj.get(num).getNumObj()) {
+                        if (isProtocolPrint()) {
+                            System.out.println(" time =   " + this.getCurrentTime() + "   Event '" + sim.getEventMin().getName() + "'\n"
+                                    + "                       is occuring for the object   " + sim.getName() + "\n");
+                        }
+                        sim.doT();
+                        sim.output(); // added by Inna 11.07.2018
+                    }
+                }
+                if (isProtocolPrint()) {
+                    System.out.println("Markers output:");
+                    for (PetriSim sim : getListObj()) //ДРУК поточного маркірування
+                    {
+                        sim.printMark();
+                    }
+                }
+
+                Collections.shuffle(getListObj()); // added by Inna 11.07.2018, need for correct functioning of Petri object's shared resource
+
+                getListObj().sort(PetriSim.getComparatorByPriority());
+
+                for (PetriSim e : getListObj()) {
+                    //можливо змінились умови для інших обєктів
+                    e.input(); //вхід маркерів в переходи Петрі-об'єкта
+
+                }
+                if (isProtocolPrint()) {
+                    System.out.println("Markers input:");
+                    for (PetriSim e : getListObj()){ //ДРУК поточного маркірування
+                        e.printMark();
+                    }
+                }
+            }
+        }
+        getListObj().sort(PetriSim.getComparatorByNum()); // return the initial order in the list for a correct output of the results (in SMO test)
+    }
+
     /**
      * Simulating from zero time until the time equal time modeling.<br>
      * Simulation protocol is printed on console.
@@ -143,7 +271,7 @@ public class PetriObjModel implements Serializable, Cloneable  {
         for (PetriSim e : getListObj()) { //edited 9.11.2015, 18.07.2018
             e.input();
         }
-        if (isProtocolPrint() == true) {
+        if (isProtocolPrint()) {
             for (PetriSim e : getListObj()) {
                 e.printMark();
             }
@@ -167,7 +295,7 @@ public class PetriObjModel implements Serializable, Cloneable  {
              return;
             
              }*/
-            if (isStatistics() == true) {
+            if (isStatistics()) {
                 for (PetriSim e : getListObj()) {
                    if (min > 0) {
                         if(min<this.getSimulationTime())
